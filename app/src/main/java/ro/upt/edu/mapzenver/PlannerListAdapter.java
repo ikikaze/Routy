@@ -21,11 +21,11 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
     private Context _context;
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
-    private HashMap<String,List<Map.Entry<Marker,String>>> _listDataChild;
-    private boolean listOrderChanged=false;
+    private HashMap<String, List<Map.Entry<Marker, String>>> _listDataChild;
+    private boolean listOrderChanged = false;
 
     public PlannerListAdapter(Context context, List<String> listDataHeader,
-                              HashMap<String,List<Map.Entry<Marker,String>>> listChildData) {
+                              HashMap<String, List<Map.Entry<Marker, String>>> listChildData) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
@@ -46,9 +46,9 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
     public View getChildView(final int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
-        final Map.Entry<Marker,String> child = (Map.Entry<Marker,String>) getChild(groupPosition,childPosition);
+        final Map.Entry<Marker, String> child = (Map.Entry<Marker, String>) getChild(groupPosition, childPosition);
 
-        final String childText = (childPosition+1) +". "+ (child.getValue());
+        final String childText = (childPosition + 1) + ". " + (child.getValue());
 
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -56,11 +56,11 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.list_item, null);
         }
 
-        TextView tView = (TextView)convertView.findViewById(R.id.pointText);
+        TextView tView = (TextView) convertView.findViewById(R.id.pointText);
         tView.setText(childText);
 
-        ImageButton arrowUp= (ImageButton) convertView.findViewById(R.id.upArrow);
-        if(childPosition==0)
+        ImageButton arrowUp = (ImageButton) convertView.findViewById(R.id.upArrow);
+        if (childPosition == 0)
             arrowUp.setVisibility(View.INVISIBLE);
         else
             arrowUp.setVisibility(View.VISIBLE);
@@ -69,14 +69,14 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
         arrowUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MoveItemUp(groupPosition,childPosition);
+                MoveItemUp(groupPosition, childPosition);
 
             }
         });
 
-        ImageButton arrowDown= (ImageButton) convertView.findViewById(R.id.downArrow);
+        ImageButton arrowDown = (ImageButton) convertView.findViewById(R.id.downArrow);
 
-        if(childPosition==getChildrenCount(groupPosition)-1)
+        if (childPosition == getChildrenCount(groupPosition) - 1)
             arrowDown.setVisibility(View.INVISIBLE);
         else
             arrowDown.setVisibility(View.VISIBLE);
@@ -84,28 +84,23 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
         arrowDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MoveItemDown(groupPosition,childPosition);
+                MoveItemDown(groupPosition, childPosition);
             }
         });
 
 
         ImageButton switchButton = (ImageButton) convertView.findViewById(R.id.btnSwitch);
-        if(groupPosition ==1)
-        {
+        if (groupPosition == 1) {
             switchButton.setImageResource(android.R.drawable.ic_input_add);
-        }
-        else
+        } else
             switchButton.setImageResource(android.R.drawable.ic_delete);
 
         switchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchGroup(groupPosition,childPosition);
+                switchGroup(groupPosition, childPosition);
             }
         });
-
-
-
 
 
         //txtListChild.setText(childText);
@@ -113,52 +108,50 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
     }
 
     private void switchGroup(int groupPosition, int childPosition) {
-        Map.Entry<Marker,String> name = (Map.Entry<Marker,String> )getChild(groupPosition,childPosition);
-        String groupName =(String) getGroup(groupPosition);
-        List<Map.Entry<Marker,String>> children = _listDataChild.get(groupName);
+        Map.Entry<Marker, String> name = (Map.Entry<Marker, String>) getChild(groupPosition, childPosition);
+        String groupName = (String) getGroup(groupPosition);
+        List<Map.Entry<Marker, String>> children = _listDataChild.get(groupName);
 
         children.remove(name);
 
-        _listDataChild.put(groupName,children);
+        _listDataChild.put(groupName, children);
         String otherGroup;
-        if(groupPosition==0)
-             otherGroup= (String) getGroup(1);
+        if (groupPosition == 0)
+            otherGroup = (String) getGroup(1);
         else
-            otherGroup=(String) getGroup(0);
+            otherGroup = (String) getGroup(0);
 
-        children=_listDataChild.get(otherGroup);
+        children = _listDataChild.get(otherGroup);
         children.add(name);
-        _listDataChild.put(otherGroup,children);
+        _listDataChild.put(otherGroup, children);
 
         notifyDataSetChanged();
     }
 
-    private void MoveItemDown(int group, int child)
-    {
-        Map.Entry<Marker,String> belowChildName = (Map.Entry<Marker,String> )getChild(group,child+1);
-        String groupName =(String) getGroup(group);
-        List<Map.Entry<Marker,String>> children = _listDataChild.get(groupName);
+    private void MoveItemDown(int group, int child) {
+        Map.Entry<Marker, String> belowChildName = (Map.Entry<Marker, String>) getChild(group, child + 1);
+        String groupName = (String) getGroup(group);
+        List<Map.Entry<Marker, String>> children = _listDataChild.get(groupName);
 
         children.remove(belowChildName);
-        children.add(child,belowChildName);
-        _listDataChild.put(groupName,children);
+        children.add(child, belowChildName);
+        _listDataChild.put(groupName, children);
         notifyDataSetChanged();
-        listOrderChanged=true;
+        listOrderChanged = true;
     }
 
 
-    private void MoveItemUp(int group, int child)
-    {
-        Map.Entry<Marker,String> childName = (Map.Entry<Marker,String>)getChild(group,child);
-        Map.Entry<Marker,String> aboveChildName = (Map.Entry<Marker,String>)getChild(group,child-1);
-        String groupName =(String) getGroup(group);
-        List<Map.Entry<Marker,String>> children = _listDataChild.get(groupName);
+    private void MoveItemUp(int group, int child) {
+        Map.Entry<Marker, String> childName = (Map.Entry<Marker, String>) getChild(group, child);
+        Map.Entry<Marker, String> aboveChildName = (Map.Entry<Marker, String>) getChild(group, child - 1);
+        String groupName = (String) getGroup(group);
+        List<Map.Entry<Marker, String>> children = _listDataChild.get(groupName);
 
         children.remove(aboveChildName);
-        children.add(child,aboveChildName);
-        _listDataChild.put(groupName,children);
+        children.add(child, aboveChildName);
+        _listDataChild.put(groupName, children);
         notifyDataSetChanged();
-        listOrderChanged=true;
+        listOrderChanged = true;
 
 
     }
@@ -213,19 +206,16 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
     }
 
 
-    public HashMap<String, List<Map.Entry<Marker, String>>> getItems()
-    {
+    public HashMap<String, List<Map.Entry<Marker, String>>> getItems() {
         return _listDataChild;
     }
 
 
-    public void setListReordered()
-    {
-        listOrderChanged=false;
+    public void setListReordered() {
+        listOrderChanged = false;
     }
 
-    public boolean isListOrderChanged()
-    {
+    public boolean isListOrderChanged() {
         return listOrderChanged;
     }
 }

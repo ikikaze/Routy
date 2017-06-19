@@ -24,64 +24,56 @@ import retrofit2.Response;
 public class RoutePlanner {
 
 
-    private static HashMap<Marker,String> routePoints = new LinkedHashMap<Marker,String>();
-    private static HashMap<Marker,String> nonRoutePoints = new LinkedHashMap<Marker,String>();
-    private static Marker  destination,startPoint;
-    private Route route;
-
-    MapzenSearch mapzenSearch;
-
-
+    private static HashMap<Marker, String> routePoints = new LinkedHashMap<Marker, String>();
+    private static HashMap<Marker, String> nonRoutePoints = new LinkedHashMap<Marker, String>();
+    private static Marker destination, startPoint;
     private static RoutePlanner ourInstance = new RoutePlanner();
+    MapzenSearch mapzenSearch;
+    private Route route;
     private Context context;
+
+    private RoutePlanner() {
+    }
 
     public static RoutePlanner getInstance() {
         return ourInstance;
     }
 
-    private RoutePlanner() {
-    }
-
-
-    public void setDestination()
-    {
+    public void setDestination() {
         //TODO fix this if needed
 
         //destination = routePoints.get(routePoints.size()-1);
     }
 
-    public void setStartPoint(Marker startPoint)
-    {
-        RoutePlanner.startPoint=startPoint;
+    public void setStartPoint(Marker startPoint) {
+        RoutePlanner.startPoint = startPoint;
     }
 
-    public void addPointToRoute(Marker point)
-    {
-        routePoints.put(point,"null");
-        LngLat location= point.getLocation();
+    public void addPointToRoute(Marker point) {
+        routePoints.put(point, "null");
+        LngLat location = point.getLocation();
         reverseRoutePoint(point);
     }
 
     private void reverseRoutePoint(final Marker point) {
         //only reverse points if context was set and search is initialized
-        if(context!=null )
-        {
-            LngLat coordinates =point.getLocation();
+        if (context != null) {
+            LngLat coordinates = point.getLocation();
             mapzenSearch.reverse(coordinates.latitude, coordinates.longitude, new Callback<Result>() {
                 @Override
                 public void onResponse(Call<Result> call, Response<Result> response) {
-                    Feature feature =response.body().getFeatures().get(0); //get first suggestion
+                    Feature feature = response.body().getFeatures().get(0); //get first suggestion
                     List<Double> coordinates = feature.geometry.coordinates;
 
 
-                    Marker marker = new Marker(coordinates.get(0),coordinates.get(1));
+                    Marker marker = new Marker(coordinates.get(0), coordinates.get(1));
 
-                    routePoints.put(point,feature.properties.name);
+                    routePoints.put(point, feature.properties.name);
                 }
 
                 @Override
                 public void onFailure(Call<Result> call, Throwable t) {
-                    Log.d("FAIL","callbackfailroutepoint");
+                    Log.d("FAIL", "callbackfailroutepoint");
                 }
             });
 
@@ -91,123 +83,105 @@ public class RoutePlanner {
 
     private void reverseNonRoutePoint(final Marker point) {
         //only reverse points if context was set and search is initialized
-        if(context!=null )
-        {
-            LngLat coordinates =point.getLocation();
+        if (context != null) {
+            LngLat coordinates = point.getLocation();
             mapzenSearch.reverse(coordinates.latitude, coordinates.longitude, new Callback<Result>() {
                 @Override
                 public void onResponse(Call<Result> call, Response<Result> response) {
-                    Feature feature =response.body().getFeatures().get(0); //get first suggestion
+                    Feature feature = response.body().getFeatures().get(0); //get first suggestion
                     List<Double> coordinates = feature.geometry.coordinates;
-                    Marker marker = new Marker(coordinates.get(0),coordinates.get(1));
-                    nonRoutePoints.put(point,feature.properties.name);
+                    Marker marker = new Marker(coordinates.get(0), coordinates.get(1));
+                    nonRoutePoints.put(point, feature.properties.name);
                 }
 
                 @Override
                 public void onFailure(Call<Result> call, Throwable t) {
-                    Log.d("FAIL","callbackfailnonroutepoint");
+                    Log.d("FAIL", "callbackfailnonroutepoint");
                 }
             });
         }
     }
 
 
-
-    public void addCurrentMarkerToRoute(Marker marker)
-    {
-        routePoints.put(marker,nonRoutePoints.get(marker));
+    public void addCurrentMarkerToRoute(Marker marker) {
+        routePoints.put(marker, nonRoutePoints.get(marker));
         //reverseRoutePoint(marker);
         nonRoutePoints.remove(marker);
     }
 
-    public void addPoint(Marker point)
-    {
-        nonRoutePoints.put(point,"");
+    public void addPoint(Marker point) {
+        nonRoutePoints.put(point, "");
         reverseNonRoutePoint(point);
     }
 
-    public Marker getDestination()
-    {
+    public Marker getDestination() {
         return destination;
     }
 
-    public Marker getStartPoint()
-    {
+    public Marker getStartPoint() {
         return startPoint;
     }
 
+    public void setStartPoint(Location location) {
+        startPoint = new Marker(location.getLongitude(), location.getLatitude());
 
-    public HashMap<Marker,String> getRoutePoints()
-    {
+    }
+
+    public HashMap<Marker, String> getRoutePoints() {
         return routePoints;
     }
 
-    public HashMap<Marker,String> getNonRoutePoints()
-    {
+    public HashMap<Marker, String> getNonRoutePoints() {
         return nonRoutePoints;
     }
 
-    public void setStartPoint(Location location)
-    {
-        startPoint = new Marker(location.getLongitude(),location.getLatitude());
-
-    }
-
-    public void clearAll()
-    {
+    public void clearAll() {
         routePoints.clear();
         nonRoutePoints.clear();
     }
 
-    public void setContext(Context context)
-    {
-        this.context=context;
-        initSearch();
-    }
-
-    public Context getContext()
-    {
+    public Context getContext() {
         return context;
     }
 
-    private void initSearch()
-    {
-        mapzenSearch=new MapzenSearch(context);
+    public void setContext(Context context) {
+        this.context = context;
+        initSearch();
+    }
+
+    private void initSearch() {
+        mapzenSearch = new MapzenSearch(context);
     }
 
 
-    public void reorderPoints(List<Map.Entry<Marker, String>> route, List<Map.Entry<Marker, String>> nonRoute)
-    {
-        HashMap<Marker,String> newRouteOrder=new LinkedHashMap<Marker,String>();
+    public void reorderPoints(List<Map.Entry<Marker, String>> route, List<Map.Entry<Marker, String>> nonRoute) {
+        HashMap<Marker, String> newRouteOrder = new LinkedHashMap<Marker, String>();
 
-        for(Map.Entry<Marker,String> point : route)
-        {
-            newRouteOrder.put(point.getKey(),point.getValue());
+        for (Map.Entry<Marker, String> point : route) {
+            newRouteOrder.put(point.getKey(), point.getValue());
         }
 
         routePoints.clear();
-       routePoints=(HashMap<Marker,String>) newRouteOrder.clone();
+        routePoints = (HashMap<Marker, String>) newRouteOrder.clone();
 
-        for(Marker point : routePoints.keySet())
-        {
+        for (Marker point : routePoints.keySet()) {
             routePoints.get(point);
         }
 
         newRouteOrder.clear();
-        for(Marker point : newRouteOrder.keySet())
-        {
-            routePoints.put(point,newRouteOrder.get(point));
+        for (Marker point : newRouteOrder.keySet()) {
+            routePoints.put(point, newRouteOrder.get(point));
         }
 
         nonRoutePoints.putAll(newRouteOrder);
 
     }
 
-    public void setRoute(Route route) {
-        this.route=route;
-    }
-
     public Route getRoute() {
         return route;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
     }
 }

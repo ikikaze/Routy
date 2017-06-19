@@ -26,22 +26,23 @@ public class SearchListAdapter extends AutoCompleteAdapter {
 
     public SearchListAdapter(Context context, int resource) {
         super(context, resource);
-        this.context=context;
+        this.context = context;
     }
 
-    @Override public View getView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-        if(convertView == null) {
-            convertView = ((Activity)context).getLayoutInflater().inflate(R.layout.list_item_double,null,false);
+        if (convertView == null) {
+            convertView = ((Activity) context).getLayoutInflater().inflate(R.layout.list_item_double, null, false);
         }
 
-        AutoCompleteItem item= getItem(position);
+        AutoCompleteItem item = getItem(position);
         String itemText = item.getText();
-        String[] splitted = itemText.split(",",2);
+        String[] splitted = itemText.split(",", 2);
         final TextView bigText = (TextView) convertView.findViewById(R.id.big_text);
         final TextView smallText = (TextView) convertView.findViewById(R.id.small_text);
         bigText.setText(splitted[0]);
-        if(splitted.length>1)
+        if (splitted.length > 1)
             smallText.setText(splitted[1]);
         else
             smallText.setText("");

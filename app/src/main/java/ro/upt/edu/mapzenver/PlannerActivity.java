@@ -45,7 +45,7 @@ public class PlannerActivity extends BaseActivity {
     MapzenRouter mapzenRouter;
 
     List<String> listGroups;
-    HashMap<String,List<Map.Entry<Marker,String>>> listChildren;
+    HashMap<String, List<Map.Entry<Marker, String>>> listChildren;
 
 
     @Override
@@ -53,28 +53,27 @@ public class PlannerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planner);
 
-        mapzenSearch=new MapzenSearch(this);
-        mapzenRouter=new MapzenRouter(this);
+        mapzenSearch = new MapzenSearch(this);
+        mapzenRouter = new MapzenRouter(this);
 
 
-
-        routePlanner= RoutePlanner.getInstance();
-        expandableListView= (ExpandableListView) findViewById(R.id.pointList);
+        routePlanner = RoutePlanner.getInstance();
+        expandableListView = (ExpandableListView) findViewById(R.id.pointList);
         expandableListView.setBackground(getResources().getDrawable(R.drawable.list_bg));
         configList();
 
-        adapter=new PlannerListAdapter(this,listGroups,listChildren);
+        adapter = new PlannerListAdapter(this, listGroups, listChildren);
         expandableListView.setAdapter(adapter);
         expandableListView.expandGroup(0);
         expandableListView.expandGroup(1);
 
         btnPreview = (Button) findViewById(R.id.btnPreview);
-        btnInfo= (FloatingActionButton) findViewById(R.id.btnInfo);
+        btnInfo = (FloatingActionButton) findViewById(R.id.btnInfo);
         btnGo = (FloatingActionButton) findViewById(R.id.btnStartRoute);
-        btnGoLayout =(FrameLayout) findViewById(R.id.btnGoLayout);
+        btnGoLayout = (FrameLayout) findViewById(R.id.btnGoLayout);
         configBtns();
 
-        MapView mapView=(MapView) findViewById(R.id.map_view_plan);
+        MapView mapView = (MapView) findViewById(R.id.map_view_plan);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapzenMap mapzenMap) {
@@ -90,40 +89,39 @@ public class PlannerActivity extends BaseActivity {
         configRouter();
 
 
-
     }
 
     private void configRouter() {
-            mapzenRouter.setDriving();
-            mapzenRouter.setCallback(new RouteCallback() {
-                @Override public void success(Route route) {
-                    List<LngLat> coordinates = new ArrayList<>();
-                    for (ValhallaLocation location : route.getGeometry()) {
-                        coordinates.add(new LngLat(location.getLongitude(), location.getLatitude()));
+        mapzenRouter.setDriving();
+        mapzenRouter.setCallback(new RouteCallback() {
+            @Override
+            public void success(Route route) {
+                List<LngLat> coordinates = new ArrayList<>();
+                for (ValhallaLocation location : route.getGeometry()) {
+                    coordinates.add(new LngLat(location.getLongitude(), location.getLatitude()));
 
-                    }
-
-                    routePlanner.setRoute(route);
-                    Polyline polyline = new Polyline(coordinates);
-                   // mapzenMap.addPolyline(polyline);
-
-                    mapzenMap.drawRouteLine(coordinates);
-                   // LngLat dest = coordinates.get(coordinates.size()-1);
-                   // mapzenMap.drawDroppedPin(dest);
-                    for (Marker point : routePlanner.getRoutePoints().keySet())
-                    {
-                        LngLat location = point.getLocation();
-                        mapzenMap.drawDroppedPin(location);
-                    }
                 }
 
-                @Override public void failure(int i) {
-                    Log.d("Fail", "Failed to get route");
-                    Toast.makeText(PlannerActivity.this,"Whoops!Something went wrong, check internet connection and restart application!", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+                routePlanner.setRoute(route);
+                Polyline polyline = new Polyline(coordinates);
+                // mapzenMap.addPolyline(polyline);
 
+                mapzenMap.drawRouteLine(coordinates);
+                // LngLat dest = coordinates.get(coordinates.size()-1);
+                // mapzenMap.drawDroppedPin(dest);
+                for (Marker point : routePlanner.getRoutePoints().keySet()) {
+                    LngLat location = point.getLocation();
+                    mapzenMap.drawDroppedPin(location);
+                }
+            }
+
+            @Override
+            public void failure(int i) {
+                Log.d("Fail", "Failed to get route");
+                Toast.makeText(PlannerActivity.this, "Whoops!Something went wrong, check internet connection and restart application!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
 
     private void configBtns() {
@@ -161,15 +159,14 @@ public class PlannerActivity extends BaseActivity {
         mapzenMap.clearRouteLine();
         mapzenMap.removeMarker();
         mapzenMap.clearDroppedPins();
-        Marker start =routePlanner.getStartPoint();
+        Marker start = routePlanner.getStartPoint();
         LngLat startLngLat = start.getLocation();
-        double[] startCoords = {startLngLat.latitude,startLngLat.longitude};
+        double[] startCoords = {startLngLat.latitude, startLngLat.longitude};
         mapzenRouter.setLocation(startCoords);
 
-        for(Marker point :routePlanner.getRoutePoints().keySet())
-        {
+        for (Marker point : routePlanner.getRoutePoints().keySet()) {
             LngLat location = point.getLocation();
-            double[] coords={location.latitude,location.longitude};
+            double[] coords = {location.latitude, location.longitude};
             mapzenRouter.setLocation(coords);
 
         }
@@ -177,80 +174,72 @@ public class PlannerActivity extends BaseActivity {
         mapzenRouter.fetch();
 
 
-
-
     }
 
 
     private void configList() {
 
-        listGroups=new ArrayList<String>();
+        listGroups = new ArrayList<String>();
         listGroups.add("Route");
         listGroups.add("Other Markers");
 
-        List<Map.Entry<Marker,String>> routePoints = new ArrayList<Map.Entry<Marker,String>>();
+        List<Map.Entry<Marker, String>> routePoints = new ArrayList<Map.Entry<Marker, String>>();
 
-        for(Map.Entry<Marker,String> point : routePlanner.getRoutePoints().entrySet())
-        {
+        for (Map.Entry<Marker, String> point : routePlanner.getRoutePoints().entrySet()) {
 
             routePoints.add(point);
         }
 
-        List<Map.Entry<Marker,String>> nonRoutePoints = new ArrayList<Map.Entry<Marker,String>>();
+        List<Map.Entry<Marker, String>> nonRoutePoints = new ArrayList<Map.Entry<Marker, String>>();
 
-        for(Map.Entry<Marker,String> point : routePlanner.getNonRoutePoints().entrySet())
-        {
+        for (Map.Entry<Marker, String> point : routePlanner.getNonRoutePoints().entrySet()) {
 
             nonRoutePoints.add(point);
         }
 
-        listChildren=new HashMap<String,List<Map.Entry<Marker,String>>>();
+        listChildren = new HashMap<String, List<Map.Entry<Marker, String>>>();
 
-        listChildren.put(listGroups.get(0),routePoints);
-        listChildren.put(listGroups.get(1),nonRoutePoints);
+        listChildren.put(listGroups.get(0), routePoints);
+        listChildren.put(listGroups.get(1), nonRoutePoints);
 
     }
 
-    public void goClicked(View v)
-    {
-        switch (v.getId())
-        {
+    public void goClicked(View v) {
+        switch (v.getId()) {
             case R.id.textGo:
             case R.id.btnStartRoute:
-                Intent intent = new Intent(PlannerActivity.this,TripActivity.class);
+                Intent intent = new Intent(PlannerActivity.this, TripActivity.class);
                 startActivity(intent);
                 break;
-            default: break;
+            default:
+                break;
 
         }
     }
 
 
     @Override
-    public void onBackPressed()
-    {
-        if(expandableListView.getVisibility() == View.VISIBLE) {
-            if(adapter.isListOrderChanged())
+    public void onBackPressed() {
+        if (expandableListView.getVisibility() == View.VISIBLE) {
+            if (adapter.isListOrderChanged())
                 reorderRoutePointList();
             expandableListView.setVisibility(View.GONE);
             btnInfo.setVisibility(View.VISIBLE);
             btnGoLayout.setVisibility(View.VISIBLE);
             btnPreview.setVisibility(View.GONE);
 
-        }
-        else
+        } else
             super.onBackPressed();
     }
 
 
-
     private void reorderRoutePointList() {
-            HashMap<String, List<Map.Entry<Marker, String>>> adapterItems =adapter.getItems();
+        HashMap<String, List<Map.Entry<Marker, String>>> adapterItems = adapter.getItems();
 
         List<Map.Entry<Marker, String>> adapterRoutePoints = adapterItems.get("Route");
         List<Map.Entry<Marker, String>> adapterNonRoutePoints = adapterItems.get("Other Markers");
 
-        routePlanner.reorderPoints(adapterRoutePoints,adapterNonRoutePoints);
+        routePlanner.reorderPoints(adapterRoutePoints, adapterNonRoutePoints);
         setAdapterData();
         adapter.setListReordered();
     }

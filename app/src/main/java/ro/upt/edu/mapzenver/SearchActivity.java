@@ -58,22 +58,22 @@ public class SearchActivity extends BaseActivity {
 
     AutoCompleteAdapter autocompleteAdapter;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
         btnAdd = (ImageButton) findViewById(R.id.buttonAdd);
         btnClear = (ImageButton) findViewById(R.id.buttonClear);
-        fabGo   = (FloatingActionButton) findViewById(R.id.fabGo);
+        fabGo = (FloatingActionButton) findViewById(R.id.fabGo);
         btnBar = (ButtonBarLayout) findViewById(R.id.btnBar);
-        routePoints= new ArrayList<LngLat>();
-        routePlanner= RoutePlanner.getInstance();
+        routePoints = new ArrayList<LngLat>();
+        routePlanner = RoutePlanner.getInstance();
         routePlanner.setContext(this);
 
 
         listView = (AutoCompleteListView) findViewById(R.id.list_view);
         autocompleteAdapter = new SearchListAdapter(this, R.layout.list_item_double);
-
 
 
         listView.setAdapter(autocompleteAdapter);
@@ -90,15 +90,15 @@ public class SearchActivity extends BaseActivity {
 
         MapView mapView = (MapView) findViewById(R.id.map_view);
         mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override public void onMapReady(MapzenMap mapzenMap) {
+            @Override
+            public void onMapReady(MapzenMap mapzenMap) {
                 SearchActivity.this.mapzenMap = mapzenMap;
-                lostApiConnection=new LostApiConnection(SearchActivity.this,mapzenMap);
+                lostApiConnection = new LostApiConnection(SearchActivity.this, mapzenMap);
                 mapzenMap.setPersistMapData(true);
                 configMap();
                 setupPeliasSearchView(peliasSearchView);
             }
         });
-
 
 
         configBtns();
@@ -110,14 +110,12 @@ public class SearchActivity extends BaseActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentMarker !=null) {
+                if (currentMarker != null) {
                     routePlanner.addCurrentMarkerToRoute(currentMarker);
-                    Toast.makeText(SearchActivity.this,"marker added to route!",Toast.LENGTH_SHORT).show();
-                    currentMarker=null;
-                }
-                else
-                {
-                    Toast.makeText(SearchActivity.this,"No marker to add, long press on a spot on the map first!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(SearchActivity.this, "marker added to route!", Toast.LENGTH_SHORT).show();
+                    currentMarker = null;
+                } else {
+                    Toast.makeText(SearchActivity.this, "No marker to add, long press on a spot on the map first!", Toast.LENGTH_LONG).show();
                 }
 
 
@@ -129,8 +127,8 @@ public class SearchActivity extends BaseActivity {
             public void onClick(View v) {
                 mapzenMap.removeMarker();
                 routePlanner.clearAll();
-                currentMarker=null;
-                Toast.makeText(SearchActivity.this,"All markers clearead, start over!",Toast.LENGTH_LONG).show();
+                currentMarker = null;
+                Toast.makeText(SearchActivity.this, "All markers clearead, start over!", Toast.LENGTH_LONG).show();
                 btnBar.setVisibility(View.GONE);
                 fabGo.setVisibility(View.GONE);
 
@@ -140,7 +138,7 @@ public class SearchActivity extends BaseActivity {
         fabGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(SearchActivity.this, PlannerActivity.class);
+                Intent intent = new Intent(SearchActivity.this, PlannerActivity.class);
                 startActivity(intent);
                 routePlanner.setStartPoint(lostApiConnection.getMyLocation());
             }
@@ -157,12 +155,12 @@ public class SearchActivity extends BaseActivity {
         mapzenMap.setLongPressResponder(new TouchInput.LongPressResponder() {
             @Override
             public void onLongPress(float x, float y) {
-                LngLat screenLngLat = mapzenMap.screenPositionToLngLat(new PointF(x,y));
-                Marker marker = new Marker(screenLngLat.longitude,screenLngLat.latitude);
+                LngLat screenLngLat = mapzenMap.screenPositionToLngLat(new PointF(x, y));
+                Marker marker = new Marker(screenLngLat.longitude, screenLngLat.latitude);
                 routePlanner.addPoint(marker);
 
                 mapzenMap.addMarker(marker);
-                currentMarker=marker;
+                currentMarker = marker;
 
 
                 //Toast.makeText(SearchActivity.this,"click the +",Toast.LENGTH_LONG).show();
@@ -174,7 +172,6 @@ public class SearchActivity extends BaseActivity {
         });
 
 
-
     }
 
     private void setupPeliasSearchView(PeliasSearchView searchView) {
@@ -183,16 +180,17 @@ public class SearchActivity extends BaseActivity {
 
 
         searchView.setCallback(new Callback<Result>() {
-            @Override public void onResponse(Call<Result> call, Response<Result> response) {
+            @Override
+            public void onResponse(Call<Result> call, Response<Result> response) {
                 mapzenMap.clearSearchResults();
 
                 Feature feature = response.body().getFeatures().get(0);
                 List<Double> coordinates = feature.geometry.coordinates;
                 LngLat point = new LngLat(coordinates.get(0), coordinates.get(1));
-                Marker marker = new Marker(point.longitude,point.latitude);
-                currentMarker=marker;
+                Marker marker = new Marker(point.longitude, point.latitude);
+                currentMarker = marker;
                 mapzenMap.setPosition(point, 1000);
-                mapzenMap.setZoom(15f,250);
+                mapzenMap.setZoom(15f, 250);
                 routePlanner.addPoint(marker);
 
                 mapzenMap.addMarker(marker);
@@ -201,7 +199,8 @@ public class SearchActivity extends BaseActivity {
                 fabGo.setVisibility(View.VISIBLE);
             }
 
-            @Override public void onFailure(Call<Result> call, Throwable t) {
+            @Override
+            public void onFailure(Call<Result> call, Throwable t) {
             }
         });
         searchView.setIconifiedByDefault(false);
@@ -219,7 +218,7 @@ public class SearchActivity extends BaseActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
 
-                if(listView.getVisibility() != View.VISIBLE)
+                if (listView.getVisibility() != View.VISIBLE)
                     listView.setVisibility(View.VISIBLE);
                 return false;
             }
@@ -227,23 +226,21 @@ public class SearchActivity extends BaseActivity {
 
 
         searchView.setOnBackPressListener(new PeliasSearchView.OnBackPressListener() {
-            @Override public void onBackPressed() {
+            @Override
+            public void onBackPressed() {
                 mapzenMap.clearSearchResults();
             }
         });
 
 
-
-
-
-
     }
 
-    @Override protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
         mapzenMap.setPersistMapData(false);
 
-        if(lostApiConnection.connected == true)
+        if (lostApiConnection.connected == true)
             lostApiConnection.getClient().disconnect();
     }
 }

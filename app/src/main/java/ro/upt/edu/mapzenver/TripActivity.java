@@ -38,7 +38,7 @@ public class TripActivity extends BaseActivity {
     MapzenRouter mapzenRouter;
     RouteEngine routeEngine;
     LostApiConnection lostApiConnection;
-    TextView textInstr,textTime,textDist;
+    TextView textInstr, textTime, textDist;
 
 
     @Override
@@ -47,13 +47,13 @@ public class TripActivity extends BaseActivity {
         setContentView(R.layout.activity_trip);
         routePlanner = RoutePlanner.getInstance();
         routePlanner.setContext(this);
-        mapzenRouter=new MapzenRouter(this);
-        routeEngine= new RouteEngine();
+        mapzenRouter = new MapzenRouter(this);
+        routeEngine = new RouteEngine();
         routeEngine.setListener(new TripListener());
 
 
-        textTime=(TextView) findViewById(R.id.txtTime);
-        textDist=(TextView) findViewById(R.id.txtDst);
+        textTime = (TextView) findViewById(R.id.txtTime);
+        textDist = (TextView) findViewById(R.id.txtDst);
 
 
         mapzenRouter.setDriving();
@@ -73,7 +73,6 @@ public class TripActivity extends BaseActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
 
-
         MapView mapView = (MapView) findViewById(R.id.routeMap);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -83,7 +82,7 @@ public class TripActivity extends BaseActivity {
                 mapzenMap.setCameraType(CameraType.ISOMETRIC);
                 mapzenMap.setStyle(new CinnabarStyle());
                 mapzenMap.applySceneUpdates();
-                lostApiConnection=new LostApiConnection(TripActivity.this,mapzenMap);
+                lostApiConnection = new LostApiConnection(TripActivity.this, mapzenMap);
                 routeEngine.setRoute(routePlanner.getRoute());
 
                 List<LngLat> linePointList = new ArrayList<LngLat>();
@@ -94,11 +93,9 @@ public class TripActivity extends BaseActivity {
 
                 mapzenMap.drawRouteLine(linePointList);
                 Set<Marker> markers = routePlanner.getRoutePoints().keySet();
-                for (Marker pin : markers)
-                {
+                for (Marker pin : markers) {
                     mapzenMap.drawDroppedPin(pin.getLocation());
                 }
-
 
 
                 configRouteEngine();
@@ -127,13 +124,13 @@ public class TripActivity extends BaseActivity {
                 valhallaLocation.setLongitude(location.getLongitude());
 
                 routeEngine.onLocationChanged(valhallaLocation);
-                LngLat lngLat = new LngLat(valhallaLocation.getLongitude(),valhallaLocation.getLatitude());
+                LngLat lngLat = new LngLat(valhallaLocation.getLongitude(), valhallaLocation.getLatitude());
 
-                mapzenMap.setPosition(lngLat,250);
-                float rotation = (float ) Math.toRadians(360- location.getBearing());
+                mapzenMap.setPosition(lngLat, 250);
+                float rotation = (float) Math.toRadians(360 - location.getBearing());
                 mapzenMap.setRotation(rotation);
 
-                mapzenMap.setTilt(0.96f,250);
+                mapzenMap.setTilt(0.96f, 250);
 
             }
 
@@ -151,9 +148,8 @@ public class TripActivity extends BaseActivity {
 
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(lostApiConnection.getClient(), request, listener);
+        } catch (SecurityException e) {
         }
-        catch (SecurityException e){}
-
 
 
     }
@@ -166,10 +162,9 @@ public class TripActivity extends BaseActivity {
         Route route;
 
 
-        public TripListener()
-        {
-            routePlanner= RoutePlanner.getInstance();
-            context =routePlanner.getContext();
+        public TripListener() {
+            routePlanner = RoutePlanner.getInstance();
+            context = routePlanner.getContext();
             route = routePlanner.getRoute();
 
         }
@@ -178,8 +173,7 @@ public class TripActivity extends BaseActivity {
         public void onRouteStart() {
 
 
-
-            Instruction firstInstr =route.getRouteInstructions().get(0);
+            Instruction firstInstr = route.getRouteInstructions().get(0);
             textInstr.setText(firstInstr.getHumanTurnInstruction());
 
 
@@ -189,7 +183,7 @@ public class TripActivity extends BaseActivity {
         public void onRecalculate(ValhallaLocation location) {
 
             //TODO recalculation
-            Toast.makeText(context,"I'm LOST, implement recalculation",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "I'm LOST, implement recalculation", Toast.LENGTH_SHORT).show();
 
 
         }
@@ -206,18 +200,17 @@ public class TripActivity extends BaseActivity {
         public void onMilestoneReached(int index, RouteEngine.Milestone milestone) {
 
 
-            Toast.makeText(context,"milestone: " + index + " reached: "  + milestone.name(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "milestone: " + index + " reached: " + milestone.name(), Toast.LENGTH_SHORT).show();
 
         }
 
         @Override
         public void onApproachInstruction(int index) {
 
-            Instruction instruction =route.getRouteInstructions().get(index);
-            if(instruction.getHumanTurnInstruction().length()>0)
+            Instruction instruction = route.getRouteInstructions().get(index);
+            if (instruction.getHumanTurnInstruction().length() > 0)
                 textInstr.setText(instruction.getHumanTurnInstruction());
-            textTime.setText(instruction.getTime()+"");
-
+            textTime.setText(instruction.getTime() + "");
 
 
         }
@@ -225,12 +218,11 @@ public class TripActivity extends BaseActivity {
         @Override
         public void onInstructionComplete(int index) {
 
-            Instruction instruction =route.getRouteInstructions().get(index);
-            if(instruction.getVerbalPostTransitionInstruction().length()>0)
+            Instruction instruction = route.getRouteInstructions().get(index);
+            if (instruction.getVerbalPostTransitionInstruction().length() > 0)
                 textInstr.setText(instruction.getVerbalPostTransitionInstruction());
             route.addSeenInstruction(instruction);
-            textTime.setText(instruction.getTime()+"");
-
+            textTime.setText(instruction.getTime() + "");
 
 
         }
@@ -241,16 +233,16 @@ public class TripActivity extends BaseActivity {
             textDist.setText(distanceToDestination + " m");
 
 
-           // Toast.makeText(context,"next instr dst : "+ distanceToNextInstruction + " dest dst : " + distanceToDestination ,Toast.LENGTH_SHORT).show();
+            // Toast.makeText(context,"next instr dst : "+ distanceToNextInstruction + " dest dst : " + distanceToDestination ,Toast.LENGTH_SHORT).show();
 
         }
 
         @Override
         public void onRouteComplete() {
 
-            Toast.makeText(context,"You have arrived!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "You have arrived!", Toast.LENGTH_SHORT).show();
 
-          //TODO
+            //TODO
 
         }
     }
