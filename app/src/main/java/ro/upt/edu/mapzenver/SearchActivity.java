@@ -15,6 +15,7 @@ import com.mapzen.android.graphics.MapView;
 import com.mapzen.android.graphics.MapzenMap;
 import com.mapzen.android.graphics.MapzenMapPeliasLocationProvider;
 import com.mapzen.android.graphics.OnMapReadyCallback;
+import com.mapzen.android.graphics.model.BubbleWrapStyle;
 import com.mapzen.android.graphics.model.Marker;
 import com.mapzen.android.search.MapzenSearch;
 import com.mapzen.pelias.gson.Feature;
@@ -89,12 +90,11 @@ public class SearchActivity extends BaseActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
         MapView mapView = (MapView) findViewById(R.id.map_view);
-        mapView.getMapAsync(new OnMapReadyCallback() {
+        mapView.getMapAsync(new BubbleWrapStyle(), new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapzenMap mapzenMap) {
                 SearchActivity.this.mapzenMap = mapzenMap;
                 lostApiConnection = new LostApiConnection(SearchActivity.this, mapzenMap);
-                mapzenMap.setPersistMapData(true);
                 configMap();
                 setupPeliasSearchView(peliasSearchView);
             }
@@ -117,8 +117,6 @@ public class SearchActivity extends BaseActivity {
                 } else {
                     Toast.makeText(SearchActivity.this, "No marker to add, long press on a spot on the map first!", Toast.LENGTH_LONG).show();
                 }
-
-
             }
         });
 
@@ -131,7 +129,6 @@ public class SearchActivity extends BaseActivity {
                 Toast.makeText(SearchActivity.this, "All markers clearead, start over!", Toast.LENGTH_LONG).show();
                 btnBar.setVisibility(View.GONE);
                 fabGo.setVisibility(View.GONE);
-
             }
         });
 
@@ -148,7 +145,6 @@ public class SearchActivity extends BaseActivity {
     private void configMap() {
         peliasLocationProvider.setMapzenMap(mapzenMap);
         mapzenMap.setMyLocationEnabled(true);
-
         mapzenMap.setCompassButtonEnabled(true);
         mapzenMap.setZoom(15f);
 
@@ -204,7 +200,6 @@ public class SearchActivity extends BaseActivity {
             }
         });
         searchView.setIconifiedByDefault(false);
-        mapzenSearch.getPelias().setDebug(true);
 
         searchView.setQueryHint(this.getString(R.string.search_hint));
         searchView.setCacheSearchResults(true);
@@ -235,12 +230,22 @@ public class SearchActivity extends BaseActivity {
 
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mapzenMap != null) {
+            mapzenMap.clearDroppedPins();
+            mapzenMap.clearRouteLine();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mapzenMap.setPersistMapData(false);
 
-        if (lostApiConnection.connected == true)
+        if (lostApiConnection.isConnected() == true)
             lostApiConnection.getClient().disconnect();
     }
 }

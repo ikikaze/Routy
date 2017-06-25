@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:animateLayoutChanges="true">
 
@@ -47,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:tint="@color/colorPrimaryDark"
+        app:backgroundTint="#EC9B28"
         android:src="@android:drawable/ic_dialog_map"
         android:layout_margin="10dp"
         android:visibility="gone"
@@ -60,8 +61,5 @@
         android:layout_height="match_parent"
         android:background="@color/mz_white"
         android:visibility="gone"/>
-
-
-
 
 </FrameLayout>

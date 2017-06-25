@@ -14,7 +14,6 @@ import com.mapzen.android.graphics.MapView;
 import com.mapzen.android.graphics.MapzenMap;
 import com.mapzen.android.graphics.OnMapReadyCallback;
 import com.mapzen.android.graphics.model.Marker;
-import com.mapzen.android.graphics.model.Polyline;
 import com.mapzen.android.routing.MapzenRouter;
 import com.mapzen.android.search.MapzenSearch;
 import com.mapzen.model.ValhallaLocation;
@@ -85,7 +84,6 @@ public class PlannerActivity extends BaseActivity {
 
             }
         });
-
         configRouter();
 
 
@@ -99,22 +97,14 @@ public class PlannerActivity extends BaseActivity {
                 List<LngLat> coordinates = new ArrayList<>();
                 for (ValhallaLocation location : route.getGeometry()) {
                     coordinates.add(new LngLat(location.getLongitude(), location.getLatitude()));
-
                 }
-
                 routePlanner.setRoute(route);
-                Polyline polyline = new Polyline(coordinates);
-                // mapzenMap.addPolyline(polyline);
-
                 mapzenMap.drawRouteLine(coordinates);
-                // LngLat dest = coordinates.get(coordinates.size()-1);
-                // mapzenMap.drawDroppedPin(dest);
                 for (Marker point : routePlanner.getRoutePoints().keySet()) {
                     LngLat location = point.getLocation();
                     mapzenMap.drawDroppedPin(location);
                 }
             }
-
             @Override
             public void failure(int i) {
                 Log.d("Fail", "Failed to get route");
@@ -125,22 +115,22 @@ public class PlannerActivity extends BaseActivity {
 
 
     private void configBtns() {
-
         btnPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reorderRoutePointList();
-                expandableListView.setVisibility(View.GONE);
-                btnInfo.setVisibility(View.VISIBLE);
-                btnGoLayout.setVisibility(View.VISIBLE);
-                btnPreview.setVisibility(View.GONE);
-
-                updateRoute();
-
-
+                if(adapter.getChildrenCount(0)>0)
+                {
+                    reorderRoutePointList();
+                    expandableListView.setVisibility(View.GONE);
+                    btnInfo.setVisibility(View.VISIBLE);
+                    btnGoLayout.setVisibility(View.VISIBLE);
+                    btnPreview.setVisibility(View.GONE);
+                    updateRoute();
+                }
+                else
+                    Toast.makeText(PlannerActivity.this, "Add at least one point to the route!", Toast.LENGTH_SHORT).show();
             }
         });
-
         btnInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,7 +138,6 @@ public class PlannerActivity extends BaseActivity {
                 btnPreview.setVisibility(View.VISIBLE);
                 btnInfo.setVisibility(View.GONE);
                 btnGoLayout.setVisibility(View.GONE);
-
             }
         });
     }
@@ -170,7 +159,6 @@ public class PlannerActivity extends BaseActivity {
             mapzenRouter.setLocation(coords);
 
         }
-
         mapzenRouter.fetch();
 
 
@@ -178,7 +166,6 @@ public class PlannerActivity extends BaseActivity {
 
 
     private void configList() {
-
         listGroups = new ArrayList<String>();
         listGroups.add("Route");
         listGroups.add("Other Markers");
@@ -186,19 +173,13 @@ public class PlannerActivity extends BaseActivity {
         List<Map.Entry<Marker, String>> routePoints = new ArrayList<Map.Entry<Marker, String>>();
 
         for (Map.Entry<Marker, String> point : routePlanner.getRoutePoints().entrySet()) {
-
             routePoints.add(point);
         }
-
         List<Map.Entry<Marker, String>> nonRoutePoints = new ArrayList<Map.Entry<Marker, String>>();
-
         for (Map.Entry<Marker, String> point : routePlanner.getNonRoutePoints().entrySet()) {
-
             nonRoutePoints.add(point);
         }
-
         listChildren = new HashMap<String, List<Map.Entry<Marker, String>>>();
-
         listChildren.put(listGroups.get(0), routePoints);
         listChildren.put(listGroups.get(1), nonRoutePoints);
 
@@ -213,7 +194,6 @@ public class PlannerActivity extends BaseActivity {
                 break;
             default:
                 break;
-
         }
     }
 

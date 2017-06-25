@@ -16,7 +16,6 @@ public class BaseActivity extends AppCompatActivity {
                 !BuildConfig.MAPZEN_API_KEY.equals(MapzenManager.API_KEY_DEFAULT_VALUE)) {
             MapzenManager.instance(this).setApiKey(BuildConfig.MAPZEN_API_KEY);
         }
-
         super.onCreate(savedInstanceState);
     }
 }

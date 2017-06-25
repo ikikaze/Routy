@@ -26,8 +26,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Distance to dst"
             android:id="@+id/txtDst"
+            android:text="Distance to destination"
             android:textColor="#000000"
             android:textAppearance="?android:attr/textAppearanceLarge"
             />
@@ -37,8 +37,9 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#000000"
+            android:text="Time until arrival"
             android:id="@+id/txtTime"
-            android:text="time remaining to dst"/>
+            />
 
     </LinearLayout>
 

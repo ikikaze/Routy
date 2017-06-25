@@ -65,7 +65,6 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
         else
             arrowUp.setVisibility(View.VISIBLE);
 
-
         arrowUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,8 +101,6 @@ public class PlannerListAdapter extends BaseExpandableListAdapter {
             }
         });
 
-
-        //txtListChild.setText(childText);
         return convertView;
     }
 

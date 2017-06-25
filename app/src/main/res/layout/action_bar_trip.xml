@@ -14,6 +14,5 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#fff"
         android:textStyle="bold"
-        android:text="basetextIdea"
         android:layout_alignParentLeft="true"/>
 </RelativeLayout>
